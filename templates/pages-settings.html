@@ -1,0 +1,316 @@
+{% extends "base.html" %}
+
+{% block title %}Settings{% endblock %}
+
+{% block body %}
+<main class="content">
+	<div class="container-fluid p-0">
+
+		<h1 class="h3 mb-3">Settings</h1>
+
+		<div class="row">
+			<div class="col-md-3 col-xl-2">
+
+				<div class="card">
+					<div class="card-header">
+						<h5 class="card-title mb-0">Profile Settings</h5>
+					</div>
+
+					<div class="list-group list-group-flush" role="tablist">
+						<a class="list-group-item list-group-item-action active" data-bs-toggle="list" href="#personal" role="tab">
+							Personal
+						</a>
+						<a class="list-group-item list-group-item-action" data-bs-toggle="list" href="#accounts" role="tab">
+							Accounts
+						</a>
+						<!--
+						<a class="list-group-item list-group-item-action" data-bs-toggle="list" href="#" role="tab">
+							Privacy and safety
+						</a>
+						<a class="list-group-item list-group-item-action" data-bs-toggle="list" href="#" role="tab">
+							Email notifications
+						</a>
+						<a class="list-group-item list-group-item-action" data-bs-toggle="list" href="#" role="tab">
+							Web notifications
+						</a>
+						<a class="list-group-item list-group-item-action" data-bs-toggle="list" href="#" role="tab">
+							Widgets
+						</a>
+						<a class="list-group-item list-group-item-action" data-bs-toggle="list" href="#" role="tab">
+							Your data
+						</a>
+						-->
+						<a class="list-group-item list-group-item-action" data-bs-toggle="list" href="#" role="tab">
+							Delete account
+						</a>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-md-9 col-xl-10">
+				<div class="tab-content">
+					<!--Personal card-->
+					<div class="tab-pane fade show active" id="personal" role="tabpanel">
+						<div class="card">
+							<div class="card-header">
+								<div class="card-actions float-end">
+									<div class="dropdown show">
+										<a href="#" data-bs-toggle="dropdown" data-bs-display="static">
+											<i class="align-middle" data-feather="more-horizontal"></i>
+										</a>
+										<div class="dropdown-menu dropdown-menu-end">
+											<a class="dropdown-item" href="#">Edit details</a>
+										</div>
+									</div>
+								</div>
+								<h5 class="card-title mb-0">Private info</h5>
+							</div>
+							<div class="card-body">
+								<form>
+									<div class="row">
+										<div class="mb-3 col-md-6">
+											<label for="inputFirstName" class="form-label">First name</label>
+											<input type="text" class="form-control" id="inputFirstName" placeholder="First name">
+										</div>
+										<div class="mb-3 col-md-6">
+											<label for="inputLastName" class="form-label">Last name</label>
+											<input type="text" class="form-control" id="inputLastName" placeholder="Last name">
+										</div>
+									</div>
+									<div class="mb-3 col-md-2">
+										<label for="inputDob" class="form-label">Date of Birth</label>
+										<input type="date" class="form-control" id="inputDob" placeholder="DOB">
+									</div>
+									<div class="mb-3">
+										<label for="inputEmail4" class="form-label">Email</label>
+										<input type="email" class="form-control" id="inputEmail4" placeholder="Email">
+									</div>
+									<div class="mb-3">
+										<label for="inputAddress" class="form-label">Address</label>
+										<input type="text" class="form-control" id="inputAddress" placeholder="1234 Main St">
+									</div>
+									<div class="mb-3">
+										<label for="inputAddress2" class="form-label">Address 2</label>
+										<input type="text" class="form-control" id="inputAddress2" placeholder="Apartment, studio, or floor">
+									</div>
+									<div class="row">
+										<div class="mb-3 col-md-6">
+											<label for="inputCity" class="form-label">City</label>
+											<input type="text" class="form-control" id="inputCity">
+										</div>
+										<div class="mb-3 col-md-4">
+											<label for="inputState" class="form-label">State</label>
+											<select id="inputState" class="form-control">
+									<option selected>Choose...</option>
+									<option>...</option>
+									</select>
+										</div>
+										<div class="mb-3 col-md-2">
+											<label for="inputZip" class="form-label">Zip</label>
+											<input type="text" class="form-control" id="inputZip">
+										</div>
+									</div>
+									<button type="submit" class="btn btn-primary">Save changes</button>
+								</form>
+
+							</div>
+						</div>
+
+						<div class="card">
+							<div class="card-header">
+								<div class="card-actions float-end">
+									<div class="dropdown show">
+										<a href="#" data-bs-toggle="dropdown" data-bs-display="static">
+											<i class="align-middle" data-feather="more-horizontal"></i>
+										</a>
+										<div class="dropdown-menu dropdown-menu-end">
+											<a class="dropdown-item" href="#">Edit details</a>
+										</div>
+									</div>
+								</div>
+								<h5 class="card-title mb-0">Health</h5>
+							</div>
+							<div class="card-body">
+								<form>
+									
+									<div class="mb-3 col-md-2">
+										<label for="inputHeight" class="form-label">Height (lbs)</label>
+										<input type="text" class="form-control" id="inputHeight" placeholder="Height">
+									</div>
+									<div class="mb-3 col-md-2">
+										<label for="inputWeight" class="form-label">Weight (in)</label>
+										<input type="text" class="form-control" id="inputWeight" placeholder="Weight">
+									</div>
+									<div class="mb-3 col-md-4">
+										<label for="inputState" class="form-label">Activity Level</label>
+										<select id="inputState" class="form-control">
+											<option selected>Choose...</option>
+											<option>Not Active</option>
+											<option>Lightly Active</option>
+											<option>Moderately Active</option>
+											<option>Very Active</option>
+										</select>
+									</div>
+									<div class="mb-3 col-md-4">
+										<label for="inputState" class="form-label">Fitness Goal</label>
+										<select id="inputState" class="form-control">
+											<option selected>Choose...</option>
+											<option>Maintenance</option>
+											<option>Cutting</option>
+											<option>Bulking</option>
+										</select>
+									</div>
+									
+									<button type="submit" class="btn btn-primary">Save changes</button>
+								</form>
+
+							</div>
+						</div>
+
+					</div>
+
+					<!--Linked accounts-->
+					<div class="tab-pane fade" id="accounts" role="tabpanel">
+						<div class="card">
+							<div class="card-header">
+								<div class="card-actions float-end">
+									<div class="dropdown show">
+										<a href="#" data-bs-toggle="dropdown" data-bs-display="static">
+											<i class="align-middle" data-feather="more-horizontal"></i>
+										</a>
+
+										<div class="dropdown-menu dropdown-menu-end">
+											<a class="dropdown-item" href="#">Edit details</a>
+											<a class="dropdown-item" style="color:red;" href="#">Delete account</a>
+										</div>
+									</div>
+								</div>
+								<h5 class="card-title mb-0">MyFitnessPal</h5>
+							</div>
+							<div class="card-body">
+								<form action="/settings" method="POST" autocomplete="off">
+									<div class="row">
+										<div class="col-md-8">
+											<div class="mb-3">
+												<label for="inputEmailPal" class="form-label">Username</label>
+												<input type="text" class="form-control" name="inputEmailPal" id="inputEmailPal" placeholder="Username" autocomplete="off">
+											</div>
+											<div class="mb-3">
+												<label for="inputPasswordPal" class="form-label">Password</label>
+												<input type="password" class="form-control" name="inputPasswordPal" id="inputPasswordPal" placeholder="Password" autocomplete="new-password">
+											</div>
+										</div>
+									</div>
+
+									<button type="submit" name="submit_button" id="submit_button" value="mfp" class="btn btn-primary">Save changes</button>
+								</form>
+
+							</div>
+						</div>
+						<div class="card">
+							<div class="card-header">
+								<div class="card-actions float-end">
+									<div class="dropdown show">
+										<a href="#" data-bs-toggle="dropdown" data-bs-display="static">
+											<i class="align-middle" data-feather="more-horizontal"></i>
+										</a>
+
+										<div class="dropdown-menu dropdown-menu-end">
+											<a class="dropdown-item" href="#">Edit details</a>
+											<a class="dropdown-item" style="color:red;" href="#">Relete account</a>
+										</div>
+									</div>
+								</div>
+								<h5 class="card-title mb-0">Fitbod</h5>
+							</div>
+							<div class="card-body">
+								<form autocomplete="off">
+									<div class="row">
+										<div class="col-md-8">
+											<div class="mb-3">
+												<label for="inputEmailFit" class="form-label">Email</label>
+												<input type="text" class="form-control" name="inputEmailFit" id="inputEmailFit" placeholder="Email" autocomplete="off">
+											</div>
+											<div class="mb-3">
+												<label for="inputPasswordFit" class="form-label">Password</label>
+												<input type="password" class="form-control" name="inputPasswordFit" id="inputPasswordFit" placeholder="Password" autocomplete="new-password">
+											</div>
+										</div>
+									</div>
+
+									<button id="notyf-show" value="fitbod" class="btn btn-primary">Save changes</button>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</main>
+{% endblock %}
+
+{% block js %}
+<script>
+	// Notyf
+	document.addEventListener("DOMContentLoaded", function() {
+			var currentMessageIndex = -1;
+
+			function getMessage() {
+				var messages = [
+					"My name is Inigo Montoya. You killed my father. Prepare to die!",
+					"Are you the six fingered man?",
+					"Inconceivable!",
+					"I do not think that means what you think it means.",
+					"Have fun storming the castle!",
+				];
+				currentMessageIndex++;
+				if (currentMessageIndex === messages.length) {
+					currentMessageIndex = 0;
+				}
+				return messages[currentMessageIndex];
+			};
+			document.querySelector("#notyf-show").addEventListener("click", function() {
+				var message = document.querySelector("#notyf-message").value || getMessage();
+				var type = document.querySelector("#notyf-type").value;
+				var duration = document.querySelector("#notyf-duration").value;
+				var ripple = document.querySelector("#notyf-ripple").checked;
+				var dismissible = document.querySelector("#notyf-dismissible").checked;
+				var positionX = document.querySelector("input[name=\"notyf-position-x\"]:checked").value;
+				var positionY = document.querySelector("input[name=\"notyf-position-y\"]:checked").value;
+				window.notyf.open({
+					type,
+					message,
+					duration,
+					ripple,
+					dismissible,
+					position: {
+						x: positionX,
+						y: positionY
+					}
+				});
+			});
+		});
+</script>
+{% endblock %}
+
+<!--
+var message = "Successfully linked account!";
+var type = success;
+var duration = 3000;
+var ripple = False;
+var dismissible = True;
+var positionX =  right;
+var positionY = top;
+window.notyf.open({
+	type,
+	message,
+	duration,
+	ripple,
+	dismissible,
+	position: {
+		x: positionX,
+		y: positionY
+	}
+});
+-->
