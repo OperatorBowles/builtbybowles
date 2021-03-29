@@ -215,6 +215,8 @@ def index():
 
             return render_template("dashboard-default.html", rows=rows, sums=sums, weights=weights, macros=macros, goals=goals)
         except:
+            macros = {0, 0, 0}
+            goals = {0, 0, 0}
             return render_template("dashboard-default.html", rows=rows, sums=sums, weights=weights, macros=macros, goals=goals)
     else:
         return render_template("index.html")
