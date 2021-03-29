@@ -363,23 +363,20 @@ def register():
         else:
             print("Error! Cannot create the database connection.")
 
-        if request.form.get("password") == request.form.get("confirm_password"):
-            session["name"] = request.form.get("name")
-            session["email"] = request.form.get("email")
-            
-            # Get variables from the form
-            email = request.form.get("email")
-            name = request.form.get("name")
-            password = request.form.get("password")
+        session["name"] = request.form.get("name")
+        session["email"] = request.form.get("email")
+        
+        # Get variables from the form
+        email = request.form.get("email")
+        name = request.form.get("name")
+        password = request.form.get("password")
 
-            # Register the new user
-            user = (email, name, password)
-            conn = create_connection(DATABASE)
-            register_user(conn, user)
+        # Register the new user
+        user = (email, name, password)
+        conn = create_connection(DATABASE)
+        register_user(conn, user)
 
-            return redirect("/")
-        else:
-            return render_template("pages-sign-up.html")
+        return redirect("/")
     else:
         return render_template("pages-sign-up.html")
 
