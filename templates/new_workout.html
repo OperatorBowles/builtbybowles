@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}Workouts{% endblock %}
+{% block body %}
+	<main class="content">
+		<div class="container-fluid p-0">
+			<h1 class="h3 mb-3">Log New Workout</h1>
+			<div class="row">
+				<div class="col-12 col-xl-6">
+					<div class="card">
+						<div class="card-header">
+							<h5 class="card-title">Workout Entry</h5>
+						</div>
+						<div class="card-body">
+							<form action="/workouts" method="POST">
+								<div class="mb-3">
+									<label class="form-label">Workout Name</label>
+									<input type="text" name="name" class="form-control" placeholder="Name">
+								</div>
+								<div class="mb-2">
+									<label class="form-label">Date</label>
+									<input type="date" name="log_date" class="form-control" placeholder="Date">
+								</div>
+								<div class="mb-2">
+									<label class="form-label">Duration (min)</label>
+									<input type="text" name="duration" class="form-control" placeholder="Duration">
+								</div>
+								<div class="mb-2">
+									<label class="form-label">Exercises</label>
+									<input type="text" name="exercises" class="form-control" placeholder="Exercises">
+								</div>
+								<div class="mb-2">
+									<label class="form-label">Volume (lbs)</label>
+									<input type="text" name="volume" class="form-control" placeholder="Volume">
+								</div>
+								<div class="mb-2">
+									<label class="form-label">Calories</label>
+									<input type="text" name="calories" class="form-control" placeholder="Calories">
+								</div>
+								<button type="submit" class="btn btn-primary" id="submit" name="submit">Submit</button>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</main>
+{% endblock %}
+{% block js %}
+	<script>
+	</script>
+{% endblock %}

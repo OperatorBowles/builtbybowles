@@ -14,7 +14,7 @@
 	<link href="/static/light.css" rel="stylesheet">
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
 </head>
-<body data-theme="default" data-layout="fluid" data-sidebar-position="left" data-sidebar-behavior="sticky">
+<body data-theme="colored" data-layout="fluid" data-sidebar-position="left" data-sidebar-behavior="sticky">
 	<div class="wrapper">
 		<nav id="sidebar" class="sidebar">
 			<div class="sidebar-content js-simplebar">
@@ -42,19 +42,22 @@
                         </a>
 					</li>
 					<li class="sidebar-item active">
-						<a data-bs-target="#dashboards" class="sidebar-link" href="/workouts">
-                            <i class="align-middle" data-feather="activity"></i> <span class="align-middle">Workouts</span>
-                        </a>
-					</li>
-					<li class="sidebar-item active">
-						<a data-bs-target="#dashboards" class="sidebar-link" href="/">
-                            <i class="align-middle" data-feather="thermometer"></i> <span class="align-middle">Health</span>
-                        </a>
-					</li>
-					<li class="sidebar-item active">
 						<a data-bs-target="#dashboards" class="sidebar-link" href="/">
                             <i class="align-middle" data-feather="clipboard"></i> <span class="align-middle">Tracking</span>
                         </a>
+					</li>
+					<li class="sidebar-item active">
+						<a data-bs-target="#multi" data-bs-toggle="collapse" class="sidebar-link collapsed">
+              				<i class="align-middle" data-feather="share-2"></i> <span class="align-middle">Add New</span>
+            			</a>
+						<ul id="multi" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+							<li class="sidebar-item">
+								<a data-bs-target="#multi-2" class="sidebar-link" href="/workouts">Workout</a>
+							</li>
+							<li class="sidebar-item">
+								<a data-bs-target="#multi-2" class="sidebar-link" href="/weight">Weight</a>
+							</li>
+						</ul>
 					</li>
 				</ul>
                 <!--Random side bar box-->
@@ -300,65 +303,8 @@
 			</footer>
 		</div>
 	</div>
-
 	<script src="/static/js/app.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
-	<script>
-		document.addEventListener("DOMContentLoaded", function() {
-			// Bar chart
-			new Chart(document.getElementById("chartjs-dashboard-bar"), {
-				type: "bar",
-				data: {
-					labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-					datasets: [{
-						label: "Last year",
-						backgroundColor: window.theme.primary,
-						borderColor: window.theme.primary,
-						hoverBackgroundColor: window.theme.primary,
-						hoverBorderColor: window.theme.primary,
-						data: [54, 67, 41, 55, 62, 45, 55, 73, 60, 76, 48, 79],
-						barPercentage: .325,
-						categoryPercentage: .5
-					}, {
-						label: "This year",
-						backgroundColor: window.theme["primary-light"],
-						borderColor: window.theme["primary-light"],
-						hoverBackgroundColor: window.theme["primary-light"],
-						hoverBorderColor: window.theme["primary-light"],
-						data: [69, 66, 24, 48, 52, 51, 44, 53, 62, 79, 51, 68],
-						barPercentage: .325,
-						categoryPercentage: .5
-					}]
-				},
-				options: {
-					maintainAspectRatio: false,
-					cornerRadius: 15,
-					legend: {
-						display: false
-					},
-					scales: {
-						yAxes: [{
-							gridLines: {
-								display: false
-							},
-							stacked: false,
-							ticks: {
-								stepSize: 20
-							},
-							stacked: true,
-						}],
-						xAxes: [{
-							stacked: false,
-							gridLines: {
-								color: "transparent"
-							},
-							stacked: true,
-						}]
-					}
-				}
-			});
-		});
-	</script>
 	<script>
 		document.addEventListener("DOMContentLoaded", function() {
 			$("#datetimepicker-dashboard").datetimepicker({
@@ -368,47 +314,7 @@
 			});
 		});
 	</script>
-	<script>
-		document.addEventListener("DOMContentLoaded", function() {
-			var table = document.getElementById("volume-pie")
-			var tableArr = [];
-			var tableLab = [];
-			//loop all rows and form data array
-			for ( var i = 1; i < table.rows.length; i++) {
-				tableArr.push([
-					table.rows[i].cells[1].innerHTML,
-				]);
-			tableLab.push(table.rows[i].cells[0].innerHTML)
-			}
-
-			// Pie chart
-			new Chart(document.getElementById("chartjs-dashboard-pie"), {
-				type: "pie",
-				data: {
-					labels: tableLab,
-					datasets: [{
-						data: tableArr,
-						backgroundColor: [
-							window.theme.primary,
-							window.theme.warning,
-							window.theme.danger,
-							"#E8EAED"
-						],
-						borderWidth: 5,
-						borderColor: window.theme.white
-					}]
-				},
-				options: {
-					responsive: !window.MSInputMethodContext,
-					maintainAspectRatio: false,
-					cutoutPercentage: 70,
-					legend: {
-						display: false
-					}
-				}
-			});
-		});
-	</script>
+	
 	<script>
 		document.addEventListener("DOMContentLoaded", function() {
 			$("#datatables-dashboard-projects").DataTable({
