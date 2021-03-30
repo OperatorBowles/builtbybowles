@@ -46,49 +46,48 @@ def register_user(conn, user):
 
 def new_workout(entry):
         
-        #Get workout information from form
-        workout_name = entry.get("name")
-        workout_log_date = entry.get("log_date")
-        workout_duration = entry.get("duration")
-        workout_exercises = entry.get("exercises")
-        workout_volume = entry.get("volume")
-        workout_calories = entry.get("calories")
-        
-        #Store in new variable
-        new_workout = (session["email"], workout_name, workout_log_date, workout_duration, workout_exercises, workout_volume, workout_calories)
-        sql = '''INSERT INTO workouts(user_email, name, log_date, duration, exercises, volume, calories) VALUES (?,?,?,?,?,?,?) '''
-        new_entry = (sql, new_workout)
-        return new_entry
+    #Get workout information from form
+    workout_name = entry.get("name")
+    workout_log_date = entry.get("log_date")
+    workout_duration = entry.get("duration")
+    workout_exercises = entry.get("exercises")
+    workout_volume = entry.get("volume")
+    workout_calories = entry.get("calories")
+    
+    #Store in new variable
+    new_workout = (session["email"], workout_name, workout_log_date, workout_duration, workout_exercises, workout_volume, workout_calories)
+    sql = '''INSERT INTO workouts(user_email, name, log_date, duration, exercises, volume, calories) VALUES (?,?,?,?,?,?,?) '''
+    new_entry = (sql, new_workout)
+    return new_entry
 
 def new_weight(entry):
 
-        #Get workout information from form
-        weight_log_date = entry.get("log-date")
-        weight_weight = entry.get("weight")
-        
-        #Store in new variable
-        new_weight = (session["email"], weight_log_date, weight_weight)
-        sql = '''INSERT INTO weight(user_email, log_date, weight) VALUES (?,?,?) '''
-        new_entry = (sql, new_weight)
-        return new_entry
+    #Get workout information from form
+    weight_log_date = entry.get("log-date")
+    weight_weight = entry.get("weight")
+    
+    #Store in new variable
+    new_weight = (session["email"], weight_log_date, weight_weight)
+    sql = '''INSERT INTO weight(user_email, log_date, weight) VALUES (?,?,?) '''
+    new_entry = (sql, new_weight)
+    return new_entry
 
 def new_food(entry):
-    if request.method == "POST":
 
-        #Get workout information from form
-        log_date = entry.get("log-date")
-        meal = entry.get('meal')
-        calories = entry.get('calories')
-        carbs = entry.get('carbs')
-        protein = entry.get('protein')
-        fats = entry.get('fats')
-        entry = str(datetime.now())
-        
-        #Store in new variable
-        new_food = (entry, session["email"], log_date, calories, carbs, protein, fats)
-        sql = '''INSERT INTO tracking(entry, email, entry_date, calories, carbs, protein, fats) VALUES (?,?,?,?,?,?,?) '''
-        new_entry = (sql, new_food)
-        return new_entry
+    #Get workout information from form
+    log_date = entry.get("log-date")
+    meal = entry.get('meal')
+    calories = entry.get('calories')
+    carbs = entry.get('carbs')
+    protein = entry.get('protein')
+    fats = entry.get('fats')
+    entry = str(datetime.now())
+    
+    #Store in new variable
+    new_food = (entry, session["email"], log_date, calories, carbs, protein, fats)
+    sql = '''INSERT INTO tracking(entry, email, entry_date, calories, carbs, protein, fats) VALUES (?,?,?,?,?,?,?) '''
+    new_entry = (sql, new_food)
+    return new_entry
 
 @app.route("/")
 def index():
@@ -108,6 +107,9 @@ def index():
         except:
             print("No workouts logged yet")
             workouts = {
+                'data': False,
+            }
+            sums = {
                 'data': False,
             }
 
@@ -176,6 +178,7 @@ def login():
 def tracking():
     if request.method == "POST":
         
+        print(request.form)
         if 'workouts' in request.form:
             entry = new_workout(request.form)
         elif 'health' in request.form:
@@ -183,6 +186,7 @@ def tracking():
         else:
             entry = new_food(request.form)
 
+        print(entry)
         #Establish connection to DB
         try:
             conn = create_connection(DATABASE)
@@ -194,6 +198,7 @@ def tracking():
         except:
             print("Database error")
             return render_template("tracking.html")
+
     else:
         return render_template("tracking.html")
 
