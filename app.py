@@ -13,14 +13,6 @@ Session(app)
 
 DATABASE = r'health.db'
 
-def auth_mfp(email, password):
-    client = myfitnesspal.Client(email, password)
-    try:
-        day = client.get_date(2021, 3, 1)
-        return 1
-    except:
-        return 0
-
 def create_connection(db_file):
     # Create a database connection to a SQLite database
     conn = None
@@ -45,22 +37,6 @@ def create_table(conn, create_table_sql):
     except Error as e:
         print(e)
 
-def get_user(email):
-    conn = create_connection(DATABASE)
-    cur = conn.cursor()
-    try:
-        if cur.execute("SELECT EXISTS(SELECT name FROM users WHERE email=?)", (email,)).fetchone() == (1,):
-            r = cur.execute("SELECT name FROM users WHERE email=?", (email,)).fetchone()
-            return r[0]
-    except:
-        print("User does not exist. Please register first.")
-
-def add_account(conn, new_acct_info):
-    sql = '''INSERT INTO accounts(user_email, account, acct_email, acct_password) VALUES (?,?,?,?) '''
-    cur = conn.cursor()
-    cur.execute(sql, new_acct_info)
-    conn.commit()
-
 def register_user(conn, user):
     sql = '''INSERT INTO users(email, name, password) VALUES (?,?,?);'''
     cur = conn.cursor()
@@ -68,157 +44,99 @@ def register_user(conn, user):
     conn.commit()
     print("Successfully registered new user")
 
-def get_progress(user_email):
-    conn = create_connection(DATABASE)
-    cur = conn.cursor()
-    try:
-        if cur.execute("SELECT EXISTS(SELECT acct_email FROM accounts WHERE user_email=? AND account=?)", (user_email,"MyFitnessPal",)).fetchone() == (1,):
-            r = cur.execute("SELECT acct_email, acct_password FROM accounts WHERE user_email=? AND account=?", (user_email,"MyFitnessPal",)).fetchone()
-            client = myfitnesspal.Client(r[0], password=r[1])
-            d = datetime.today()
-            macros = client.get_date(d.year, d.month, d.day)
-
-            #Store last time was run
-            sql = ''' INSERT INTO web_data(user_email, last_refresh) VALUES (?,?) '''
-            last_accessed = (session["email"], datetime.now())
-            dur = conn.cursor()
-            dur.execute(sql, last_accessed)
-            conn.commit()
-            return macros
-        else:
-            print("No account linked.")
-    except:
-        print("Error connecting to MFP.")
-
-def get_weight():
-    conn = create_connection(DATABASE)
-    cur = conn.cursor()
-    r = cur.execute("SELECT acct_email, acct_password FROM accounts").fetchone()
-    print(r[0], r[1])
-    client = myfitnesspal.Client(r[0], password=r[1])
-    try:
-        weights = client.get_measurements('Weight')
-        print("Successful connection")
-    except:
-        print("MFP did not connect")
-    sql = ''' INSERT INTO weight(user_email, log_date, weight) VALUES (?,?,?) '''
-    
-    #Adding user email to list of weights from MFP
-    new_weight = []
-    for weight in weights:
-        lst = list(weight)
-        lst.insert(0, session["email"])
-        new_weight += (tuple(lst),)
-    #Add to DB
-    cur.executemany(sql, new_weight)
-    cur.close()
-
-@app.route("/profile")
-def profile():
-    return render_template("pages-profile.html")
-
-@app.route('/api/v1/workouts/all', methods=["GET", "POST"])
-def api_all():
-    conn = create_connection(DATABASE)
-    conn.row_factory = dict_factory
-    cur = conn.cursor()
-    all_workouts = cur.execute('SELECT * FROM workouts;').fetchall()
-
-    return jsonify(all_workouts)
-
-@app.route('/api/v1/weight/all', methods=["GET", "POST"])
-def api_weights_all():
-    if request.method == "GET":
-        conn = create_connection(DATABASE)
-        conn.row_factory = dict_factory
-        cur = conn.cursor()
-        all_weights = cur.execute('SELECT * FROM weight;').fetchall()
-
-        return jsonify(all_weights)
-    else:
-        conn = create_connection(DATABASE)
-        cur = conn.cursor()
+def new_workout(entry):
+        
         #Get workout information from form
-        new_weight = (session["email"], request.args.get('log_date'), request.args.get('weight'))
-        #Write into SQL and commit
-        sql = '''INSERT INTO weight(user_email, log_date, weight) VALUES (?,?,?)'''
-        cur = conn.cursor()
-        cur.execute(sql, new_weight)
-        conn.commit()
+        workout_name = entry.get("name")
+        workout_log_date = entry.get("log_date")
+        workout_duration = entry.get("duration")
+        workout_exercises = entry.get("exercises")
+        workout_volume = entry.get("volume")
+        workout_calories = entry.get("calories")
+        
+        #Store in new variable
+        new_workout = (session["email"], workout_name, workout_log_date, workout_duration, workout_exercises, workout_volume, workout_calories)
+        sql = '''INSERT INTO workouts(user_email, name, log_date, duration, exercises, volume, calories) VALUES (?,?,?,?,?,?,?) '''
+        new_entry = (sql, new_workout)
+        return new_entry
 
-        resp = jsonify(success=True)
-        return resp
+def new_weight(entry):
 
-@app.route('/api/v1/workouts', methods=["GET"])
-def api_filter():
-    query_parameters = request.args
-    
-    id = query_parameters.get('id')
-    logged = query_parameters.get('date')
-    user = query_parameters.get('email')
+        #Get workout information from form
+        weight_log_date = entry.get("log-date")
+        weight_weight = entry.get("weight")
+        
+        #Store in new variable
+        new_weight = (session["email"], weight_log_date, weight_weight)
+        sql = '''INSERT INTO weight(user_email, log_date, weight) VALUES (?,?,?) '''
+        new_entry = (sql, new_weight)
+        return new_entry
 
-    query = "SELECT * FROM workouts WHERE"
-    to_filter = []
+def new_food(entry):
+    if request.method == "POST":
 
-    if id:
-        query += ' w_id=? AND'
-        to_filter.append(id)
-    if logged:
-        query += ' log_date=? AND'
-        to_filter.append(id)
-    if user:
-        query += ' user_email=? AND'
-        to_filter.append(id)
-    if not (id or logged or user):
-        return page_not_found(404)
-
-    query = query[:-4] + ';'
-
-    conn = create_connection(DATABASE)
-    conn.row_factory = dict_factory
-    cur = conn.cursor()
-
-    results = cur.execute(query, to_filter).fetchall()
-
-    return jsonify(results)
-
-@app.errorhandler(404)
-def page_not_found(e):
-    return "<h1>404</h1><p>The resource could not be found.</p>", 404
+        #Get workout information from form
+        log_date = entry.get("log-date")
+        meal = entry.get('meal')
+        calories = entry.get('calories')
+        carbs = entry.get('carbs')
+        protein = entry.get('protein')
+        fats = entry.get('fats')
+        entry = str(datetime.now())
+        
+        #Store in new variable
+        new_food = (entry, session["email"], log_date, calories, carbs, protein, fats)
+        sql = '''INSERT INTO tracking(entry, email, entry_date, calories, carbs, protein, fats) VALUES (?,?,?,?,?,?,?) '''
+        new_entry = (sql, new_food)
+        return new_entry
 
 @app.route("/")
 def index():
     if 'email' in session:
-        try:
-            con = sqlite3.connect("health.db")
-            con.row_factory = sqlite3.Row
-            
+        
+        con = sqlite3.connect("health.db")
+        con.row_factory = sqlite3.Row
+
+        try:    
             get_workouts = con.cursor()
             get_workouts.execute("select * from workouts order by 'log_date' ASC")
-            rows = get_workouts.fetchall();
-
-            get_weights = con.cursor()
-            get_weights.execute("select * from weight order by 'log_date' ASC LIMIT 10")
-            weights = get_weights.fetchall();
+            workouts = get_workouts.fetchall();
 
             get_workouts_chart = con.cursor()
             get_workouts_chart.execute("select name, avg(volume) as average_volume from workouts group by name order by average_volume DESC")
             sums = get_workouts_chart.fetchall();
-
-            get_macros = con.cursor()
-            macros = get_macros.execute("select carbs, protein, fats from tracking order by id DESC LIMIT 1;").fetchone()
-            macros = {'carbs': macros[0], 'protein': macros[1], 'fats': macros[2]}
-
-            get_goals = con.cursor()
-            goals = get_goals.execute("select carbs, protein, fats from goals order by id DESC LIMIT 1").fetchone()
-            goals = {'carbs': goals[0], 'protein': goals[1], 'fats': goals[2]}
-
-            return render_template("dashboard-default.html", rows=rows, sums=sums, weights=weights, macros=macros, goals=goals)
         except:
-            try:
-                return render_template("dashboard-default.html", rows=rows, sums=sums, weights=weights, macros=macros, goals=goals)
-            except:
-                return render_template("dashboard-default.html", goals={0,0,0}, macros={0,0,0})
+            print("No workouts logged yet")
+            workouts = {
+                'data': False,
+            }
+
+        try:
+            get_weights = con.cursor()
+            get_weights.execute("select * from weight order by 'log_date' ASC LIMIT 10")
+            weights = get_weights.fetchall();
+        except:
+            print("No weight logged yet")
+            weights = {0}
+      
+        try:
+            get_macros = con.cursor()
+            macros = get_macros.execute("select calories, carbs, protein, fats from tracking order by id DESC LIMIT 1;").fetchone()
+            macros = {'calories': macros [0], 'carbs': macros[1], 'protein': macros[2], 'fats': macros[3]}
+        except:
+            print("No food entries logged yet")
+            macros={0,0,0,0}
+        
+        try:
+            get_goals = con.cursor()
+            goals = get_goals.execute("select calories, carbs, protein, fats from goals order by id DESC LIMIT 1").fetchone()
+            goals = {'calories': goals[0], 'carbs': goals[1], 'protein': goals[2], 'fats': goals[3]}
+        except:
+            print("No goals logged yet")
+            goals={0,0,0,0}
+
+        return render_template("dashboard-default.html", workouts=workouts, sums=sums, weights=weights, macros=macros, goals=goals)
+
     else:
         return render_template("index.html")
 
@@ -251,53 +169,33 @@ def signout():
 def login():
     if request.method == "POST":
         session["email"] = request.form.get("email")
-        session["name"] = get_user(session["email"])
-        get_progress(session["email"])
         return redirect("/")
     return render_template("pages-sign-in.html")
 
-@app.route('/workouts', methods=["POST", "GET"])
-def workouts():
+@app.route('/tracking', methods=["POST", "GET"])
+def tracking():
     if request.method == "POST":
-        #Establish connection to DB
-        conn = create_connection(DATABASE)
-        cur = conn.cursor()
-        #Get workout information from form
-        workout_name = request.form.get("name")
-        workout_log_date = request.form.get("log_date")
-        workout_duration = request.form.get("duration")
-        workout_exercises = request.form.get("exercises")
-        workout_volume = request.form.get("volume")
-        workout_calories = request.form.get("calories")
-        #Store in new variable
-        new_workout = (session["email"], workout_name, workout_log_date, workout_duration, workout_exercises, workout_volume, workout_calories)
-        #Write into SQL and commit
-        sql = '''INSERT INTO workouts(user_email, name, log_date, duration, exercises, volume, calories) VALUES (?,?,?,?,?,?,?) '''
-        cur = conn.cursor()
-        cur.execute(sql, new_workout)
-        conn.commit()
-        return redirect("/")
-    else:
-        return render_template("workouts.html")
+        
+        if 'workouts' in request.form:
+            entry = new_workout(request.form)
+        elif 'health' in request.form:
+            entry = new_weight(request.form)
+        else:
+            entry = new_food(request.form)
 
-@app.route('/weight', methods=["POST", "GET"])
-def weight():
-    if request.method == "POST":
         #Establish connection to DB
-        conn = create_connection(DATABASE)
-        cur = conn.cursor()
-        #Get workout information from form
-        weight_log_date = request.form.get("log-date")
-        weight_weight = request.form.get("weight")
-        #Store in new variable
-        new_weight = (session["email"], weight_log_date, weight_weight)
-        #Write into SQL and commit
-        sql = '''INSERT INTO weight(user_email, log_date, weight) VALUES (?,?,?) '''
-        cur.execute(sql, new_weight)
-        conn.commit()
-        return redirect("/")
+        try:
+            conn = create_connection(DATABASE)
+            cur = conn.cursor()
+            cur.execute(entry)
+            conn.commit()
+            print("Successfully logged")
+            return redirect("/")
+        except:
+            print("Database error")
+            return render_template("tracking.html")
     else:
-        return render_template("new_weight.html")
+        return render_template("tracking.html")
 
 @app.route("/register", methods=["GET","POST"])
 def register():
@@ -311,22 +209,25 @@ def register():
 
         sql_create_tracking_table = """ CREATE TABLE IF NOT EXISTS tracking (
                                         id integer PRIMARY KEY,
+                                        entry text,
                                         email text,
-                                        entry_date datetime,
+                                        entry_date date,
+                                        calories integer,
                                         carbs integer,
                                         protein integer,
                                         fats integer 
                                     );"""
 
         sql_create_goals_table = """ CREATE TABLE IF NOT EXISTS goals (
-                                        id integer PRIMARY KEY,
-                                        email text,
+                                        email text PRIMARY KEY,
+                                        calories integer,
                                         carbs integer,
                                         protein integer,
                                         fats integer 
                                     );"""
 
         sql_create_accounts_table = """ CREATE TABLE IF NOT EXISTS accounts (
+                                            id integer PRIMARY KEY,
                                             user_email text NOT NULL,
                                             account text NOT NULL,
                                             acct_email text NOT NULL,
@@ -334,9 +235,10 @@ def register():
                                         );"""
 
         sql_create_workouts_table = """ CREATE TABLE IF NOT EXISTS workouts (
-                                        w_id integer PRIMARY KEY,
+                                        id integer PRIMARY KEY,
                                         user_email text,
                                         name text,
+                                        saved_workout text,
                                         log_date date,
                                         duration integer,
                                         exercises integer,
@@ -389,6 +291,3 @@ def main():
 def signin():
     return render_template("pages-sign-in.html")
 
-@app.route('/reset')
-def reset():
-    return render_template("pages-reset-password.html")
