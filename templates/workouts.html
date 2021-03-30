@@ -3,45 +3,92 @@
 {% block body %}
 	<main class="content">
 		<div class="container-fluid p-0">
-			<h1 class="h3 mb-3">Log New Workout</h1>
+			<h1 class="h3 mb-3">Workouts</h1>
+			<button class='h3 btn btn-success'>Start Workout</button>
 			<div class="row">
 				<div class="col-12 col-xl-6">
-					<div class="card">
-						<div class="card-header">
-							<h5 class="card-title">Workout</h5>
-						</div>
-						<div class="card-body">
-							<form action="/workouts" method="POST">
-								<div class="mb-3">
-									<label class="form-label">Workout Name</label>
-									<input type="text" name="name" class="form-control" placeholder="Name">
-								</div>
-								<div class="mb-2">
-									<label class="form-label">Date</label>
-									<input type="date" name="log_date" class="form-control" placeholder="Date">
-								</div>
-								<div class="mb-2">
-									<label class="form-label">Duration (min)</label>
-									<input type="text" name="duration" class="form-control" placeholder="Duration">
-								</div>
-								<div class="mb-2">
-									<label class="form-label">Exercises</label>
-									<input type="text" name="exercises" class="form-control" placeholder="Exercises">
-								</div>
-								<div class="mb-2">
-									<label class="form-label">Volume (lbs)</label>
-									<input type="text" name="volume" class="form-control" placeholder="Volume">
-								</div>
-								<div class="mb-2">
-									<label class="form-label">Calories</label>
-									<input type="text" name="calories" class="form-control" placeholder="Calories">
-								</div>
-								<button type="submit" class="btn btn-primary">Submit</button>
-							</form>
+					<div class="tab">
+						<ul class="nav nav-tabs" role="tablist">
+							<li class="nav-item"><a class="nav-link active" href="#tab-1" data-bs-toggle="tab" role="tab">Basic Workout</a></li>
+							<li class="nav-item"><a class="nav-link" href="#tab-2" data-bs-toggle="tab" role="tab">Advanced Workout</a></li>
+						</ul>
+						<div class="tab-content">
+							<div class="tab-pane active" id="tab-1" role="tabpanel">
+								<h4 class="tab-title">Add Workout</h4>
+								<form action="/workouts" method="POST">
+									<div class="row">
+										<div class="col-md">
+											<label class="form-label">Workout Name</label>
+											<input type="text" name="name" class="form-control" placeholder="Name">
+										</div>
+										<select class="form-control col-md">
+											<option selected>Push</option>
+											<option>Pull</option>
+											<option>Legs</option>
+											<div class="dropdown-divider"></div>
+											<a class="dropdown-item" href="#">New Workout</a>
+										</select>
+									</div>
+									<div class="mb-2">
+										<label class="form-label">Date</label>
+										<input type="date" name="log_date" id="log_date" class="form-control" placeholder="Date">
+									</div>
+									<div class="mb-2">
+										<label class="form-label">Duration (min)</label>
+										<input type="text" name="duration" class="form-control" placeholder="Duration">
+									</div>
+									<div class="mb-2">
+										<label class="form-label">Exercises</label>
+										<input type="text" name="exercises" class="form-control" placeholder="Exercises">
+									</div>
+									<div class="mb-2">
+										<label class="form-label">Volume (lbs)</label>
+										<input type="text" name="volume" class="form-control" placeholder="Volume">
+									</div>
+									<div class="mb-2">
+										<label class="form-label">Calories</label>
+										<input type="text" name="calories" class="form-control" placeholder="Calories">
+									</div>
+									<button type="submit" class="btn btn-primary">Submit</button>
+								</form>
+							</div>
+							<div class="tab-pane" id="tab-2" role="tabpanel">
+								<h4 class="tab-title">Add Workout</h4>
+								<form action="/workouts" method="POST">
+									<div class="mb-3">
+										<label class="form-label">Workout Name</label>
+										<input type="text" name="name" class="form-control" placeholder="Name">
+									</div>
+									<div class="mb-2">
+										<label class="form-label">Date</label>
+										<input type="date" name="log_date" id="log_date" class="form-control" placeholder="Date">
+									</div>
+									<div class="mb-2">
+										<label class="form-label">Duration (min)</label>
+										<input type="text" name="duration" class="form-control" placeholder="Duration">
+									</div>
+									<div class="mb-2">
+										<label class="form-label">Exercises</label>
+										<input type="text" name="exercises" class="form-control" placeholder="Exercises">
+									</div>
+									<div class="mb-2">
+										<label class="form-label">Volume (lbs)</label>
+										<input type="text" name="volume" class="form-control" placeholder="Volume">
+									</div>
+									<div class="mb-2">
+										<label class="form-label">Calories</label>
+										<input type="text" name="calories" class="form-control" placeholder="Calories">
+									</div>
+									<button type="submit" class="btn btn-primary">Submit</button>
+								</form>
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 	</main>
+{% endblock %}
+
+{% block js %}
 {% endblock %}

@@ -215,9 +215,10 @@ def index():
 
             return render_template("dashboard-default.html", rows=rows, sums=sums, weights=weights, macros=macros, goals=goals)
         except:
-            macros = {0, 0, 0}
-            goals = {0, 0, 0}
-            return render_template("dashboard-default.html", rows=rows, sums=sums, weights=weights, macros=macros, goals=goals)
+            try:
+                return render_template("dashboard-default.html", rows=rows, sums=sums, weights=weights, macros=macros, goals=goals)
+            except:
+                return render_template("dashboard-default.html", goals={0,0,0}, macros={0,0,0})
     else:
         return render_template("index.html")
 
@@ -277,7 +278,7 @@ def workouts():
         conn.commit()
         return redirect("/")
     else:
-        return render_template("new_workout.html")
+        return render_template("workouts.html")
 
 @app.route('/weight', methods=["POST", "GET"])
 def weight():
