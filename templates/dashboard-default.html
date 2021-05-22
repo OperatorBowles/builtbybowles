@@ -5,25 +5,138 @@
 {% block body %}
 	<main class="content">
 		<div class="container-fluid p-0">
-
+			
 			<div class="row mb-2 mb-xl-3">
 				<div class="col-auto d-none d-sm-block">
-					<h3>Dashboard</h3>
-				</div>
-
-				<div class="col-auto ms-auto text-end mt-n1">
-					<a class="btn btn-success" href="/tracking">Add New Entry</a>
-					<a class="btn btn-primary shadow-sm" href="/">
-						<i class="align-middle" data-feather="refresh-cw">&nbsp;</i>
-					</a>
+					<h3>Dashboard <a href="/"><span>
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-refresh-cw align-middle me-2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+					</span></a></h3>
+					<h6>Last Refresh: <span id="lastRefresh">{{ lastRefresh }}</span> </h6>
 				</div>
 			</div>
 			<!--Header row-->
 			<div class="row">
 				<!--If goals have been created and store in DB-->
-				{% if goals %}
-				<div class="col-12 col-sm-6 col-xxl d-flex">
+				<div class="col-12 col-sm-12 col-xxl d-flex">
 					<div class="card flex-fill">
+						
+						<div class="modal fade" id="new-workout" tabindex="-1" style="display: none;" aria-hidden="true">
+							<div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h5 class="modal-title">New Workout</h5>
+										<button type="submit" class="btn btn-primary" name="workouts">Save</button>
+										<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+									</div>
+									<div class="modal-body">
+										<form action="/tracking" method="POST">
+											<div class="mb-2">
+												<label class="form-label">Name</label>
+												<input type="text" name="name" class="form-control" placeholder="Name" autocomplete="off">
+											</div>
+											<div class="col-md">
+												<label class="form-label">Workout Type</label>
+												<select class="form-control col-md" name="saved" id="saved">
+													<option selected>Activity</option>
+												{% for activity in activities %}
+													<option>{{ activity.name }}</option>
+												{% endfor %}	
+													<option disabled="disabled">----</option>
+													<option>create new workout type</option>
+												</select>
+											</div>
+											<hr>
+											<div class="mb-2">
+												<label class="form-label">Date</label>
+												<input type="date" name="log_date" id="log_date" class="form-control" placeholder="Date">
+											</div>
+											<div class="mb-2">
+												<label class="form-label">Duration (min)</label>
+												<input type="text" name="duration" class="form-control" placeholder="Duration" autocomplete="off">
+											</div>
+											<div class="mb-2">
+												<label class="form-label">Exercises</label>
+												<input type="text" name="exercises" class="form-control" placeholder="Exercises" autocomplete="off">
+											</div>
+											<div class="mb-2">
+												<label class="form-label">Volume (lbs)</label>
+												<input type="text" name="volume" class="form-control" placeholder="Volume" autocomplete="off">
+											</div>
+											<div class="mb-2">
+												<label class="form-label">Calories</label>
+												<input type="text" name="calories" class="form-control" placeholder="Calories" autocomplete="off">
+											</div>
+											<p>
+											<div class="modal-footer">
+												<button type="submit" class="btn btn-primary" name="workouts">Save</button>
+												<button type="submit" class="btn btn-success" name="workouts">Save and Close</button>
+											</div>
+										</form>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="modal fade" id="new-weight" tabindex="-1" style="display: none;" aria-hidden="true">
+							<div class="modal-dialog modal-dialog-centered  modal-sm" role="document">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h5 class="modal-title">Enter New Weight</h5>
+										<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+									</div>
+									<div class="modal-body">
+										<form action="/tracking" method="POST">
+											<div class="mb-2">
+												<label class="form-label">Date</label>
+												<input type="date" name="log-date" class="form-control" placeholder="Date">
+											</div>
+											<div class="mb-2">
+												<label class="form-label">Weight (lbs)</label>
+												<input type="text" name="weight" class="form-control" placeholder="Weight">
+											</div>
+											<div class="modal-footer">
+												<button class="btn btn-success" name="health">Save</button>
+											</div>
+										</form>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="modal fade" id="centeredModalSuccess" tabindex="-1" style="display: none;" aria-hidden="true">
+							<div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h5 class="modal-title">Nutrient Goals</h5>
+										<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+									</div>
+									<div class="modal-body m-1">
+										<form action="/tracking" method="POST">
+											<div class="form-floating mb-3">
+												<input type="number" pattern="[0-9]*" name="calories" class="form-control" placeholder="Calories" id="calories" autocomplete="off">
+												<label for="calories">Calories</label>
+											</div>
+											<hr>
+											<div class="form mb-3">
+												<input type="range" class="form-range" min="0" max="100" step="5" id="rngCarb" oninput="updateCarbInput(this.value);" value="50" name="carbPerc">
+												<label for="rngCarb" class="form-label">Carbs / <span id="carbPerc">50</span>% / <span id="carbGrams" >0</span>g</label>
+											</div>
+											<div class="form mb-3">
+												<input type="range" class="form-range" min="0" max="100" step="5" id="rngProtein" oninput="updateProteinInput(this.value);" value="50" name="proteinPerc">
+												<label for="rngProtein" class="form-label">Protein / <span id="proteinPerc">50</span>% / <span id="proteinGrams">0</span>g</label>
+											</div>
+											<div class="form mb-3">
+												<input type="range" class="form-range" min="0" max="100" step="5" id="rngFat" oninput="updateFatInput(this.value);" value="50" name="fatPerc">
+												<label for="rngFat" class="form-label">Fats / <span id="fatPerc">50</span>% / <span id="fatGrams" name="fatGrams">0</span>g</label>
+											</div>
+											<div class="modal-footer">
+												<button type="submit" class="btn btn-success" name="goal" id="submitGoal" disabled="true">Save changes</button>
+											</div>
+										</form>
+									</div>
+								</div>
+							</div>
+						</div>
+
+
 						<div class="card-body py-4">
 							<div class="d-flex align-items-start">
 								<div class="flex-grow-1">
@@ -31,103 +144,58 @@
 									<h3 id="goalCarbs" class="mb-2" style="text-align:right; float:right;">{{ goals.calories }}</h3>
 									<hr style="clear:both;">						
 									<div class="progress">
-										<div class="progress-bar progO" role="progressbar" style="width: 90%" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100"></div>
+										<div class="progress-bar progO" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
 									</div>
 									<div class="mb-0" style="text-align:right; float:right; padding-top:5px;">
-										<span class="badge badge-soft-warning me-2 remainingC"> <i class="mdi mdi-arrow-bottom-right"></i>0</span>
+										<span class="badge badge-soft-warning me-2 remainingO"> <i class="mdi mdi-arrow-bottom-right"></i>0</span>
 										<span class="text-muted">Remaining</span>
 									</div>
 								</div>
 							</div>
-						</div>
-					</div>
-				</div>
-				<div class="col-12 col-sm-6 col-xxl d-flex">
-					<div class="card flex-fill">
-						<div class="card-body py-4">
-							<div class="d-flex align-items-start">
-								<div class="flex-grow-1">
-									<h3 style="text-align:left; float:left;" class="mb-2">Carbs</h3>
-									<h3 id="goalCarbs" class="mb-2" style="text-align:right; float:right;">{{ goals.carbs }}g</h3>
+							<hr>
+							<div class="row">
+								<div class="col-4 col-sm-4">
+									<h5 style="text-align:left; float:left;" class="mb-2">Carbs</h5>
+									<h5 id="goalCarbs" class="mb-2" style="text-align:right; float:right;">{{ goals.carbs }}g</h5>
 									<hr style="clear:both;">						
 									<div class="progress">
 										<div class="progress-bar progC" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
 									</div>
 									<div class="mb-0" style="text-align:right; float:right; padding-top:5px;">
 										<span class="badge badge-soft-warning me-2 remainingC"> <i class="mdi mdi-arrow-bottom-right"></i>0</span>
-										<span class="text-muted">Remaining</span>
+										<span class="text-muted">Left</span>
 									</div>
 								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="col-12 col-sm-6 col-xxl d-flex">
-					<div class="card flex-fill">
-						<div class="card-body py-4">
-							<div class="d-flex align-items-start">
-								<div class="flex-grow-1">
-									<h3 style="text-align:left; float:left;" class="mb-2">Protein</h3>
-									<h3 id="goalCarbs" class="mb-2" style="text-align:right; float:right;">{{ goals.protein }}g</h3>
+								<div class="col-4 col-sm-4">
+									<h5 style="text-align:left; float:left;" class="mb-2">Protein</h5>
+									<h5 id="goalCarbs" class="mb-2" style="text-align:right; float:right;">{{ goals.protein }}g</h5>
 									<hr style="clear:both;">						
 									<div class="progress">
 										<div class="progress-bar progP" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
 									</div>
 									<div class="mb-0" style="text-align:right; float:right; padding-top:5px;">
 										<span class="badge badge-soft-warning me-2 remainingP"> <i class="mdi mdi-arrow-bottom-right"></i>0</span>
-										<span class="text-muted">Remaining</span>
+										<span class="text-muted">Left</span>
 									</div>
 								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="col-12 col-sm-6 col-xxl d-flex">
-					<div class="card flex-fill">
-						<div class="card-body py-4">
-							<div class="d-flex align-items-start">
-								<div class="flex-grow-1">
-									<h3 style="text-align:left; float:left;" class="mb-2" id="macro-c">Fats</h3>
-									<h3 id="goalCarbs" class="mb-2" style="text-align:right; float:right;">{{ goals.fats }}g</h3>
+								<div class="col-4 col-sm-4">
+									<h5 style="text-align:left; float:left;" class="mb-2" id="macro-c">Fats</h5>
+									<h5 id="goalCarbs" class="mb-2" style="text-align:right; float:right;">{{ goals.fats }}g</h5>
 									<hr style="clear:both;">						
 									<div class="progress">
 										<div class="progress-bar progF" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
 									</div>
 									<div class="mb-0" style="text-align:right; float:right; padding-top:5px;">
 										<span class="badge badge-soft-warning me-2 remainingF"> <i class="mdi mdi-arrow-bottom-right"></i>0</span>
-										<span class="text-muted">Remaining</span>
+										<span class="text-muted">Left</span>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div>
 				</div>
-				{% else %}
-				<!--Show the Get Started card-->
-				<div class="col-12 col-sm-3">
-					<div class="card">
-						<div class="card-header">
-							<h5 class="card-title mb-0">Get Started</h5>
-						</div>
-						<div class="card-body">
-							<p class="card-text">Get started by logging some goals then progress!</p>
-							<a href="/tracking" class="btn btn-primary">Create Goals</a>
-						</div>
-					</div>
-				</div>
-				<div class="col-12 col-sm-3">
-					<div class="card">
-						<div class="card-header">
-							<h5 class="card-title mb-0">Get Started</h5>
-						</div>
-						<div class="card-body">
-							<p class="card-text">Get started by logging some goals then progress!</p>
-							<a href="/tracking" class="btn btn-primary">Log Calories</a>
-						</div>
-					</div>
-				</div>
-				{% endif %}
 			</div>
+
 			<!--Weight and food log row-->
 			<div class="row">
 				<!--Food log-->
@@ -138,6 +206,10 @@
 						</div>
 						<div class="card-body d-flex">
 							<h5>Food Log</h5>
+
+
+
+							
 						</div>
 					</div>
 				</div>
@@ -150,7 +222,7 @@
 						</div>
 						<div class="card-body d-flex w-100">
 							<div class="align-self-center chart chart-lg">
-								<canvas id="chartjs-dashboard-bar"></canvas>
+								<canvas id="chartjs-line"></canvas>
 							</div>
 						</div>
 					</div>
@@ -164,82 +236,72 @@
 				<div class="col-12 col-xl-9">
 					<div class="card">
 						<div class="card-header">
-							<div class="card-actions float-end">
-								<div class="dropdown show">
-									<a href="#" data-bs-toggle="dropdown" data-bs-display="static">
-										<i class="align-middle" data-feather="more-horizontal"></i>
-									</a>
-									<div class="dropdown-menu dropdown-menu-end">
-										<a class="dropdown-item" href="#">Action</a>
-										<a class="dropdown-item" href="#">Another action</a>
-										<a class="dropdown-item" href="#">Something else here</a>
-									</div>
-								</div>
-							</div>
 							<h5 class="card-title mb-0">Latest Workouts</h5>
 						</div>
-						<div class="table-responsive">
-							<table class="table table-striped table-sm" id="datatables-dashboard-projects">
-								<thead>
+
+						<table class="table table-striped table-sm" id="datatables-dashboard-projects">
+							<thead>
+								<tr>
+									<th class="sorting_desc" aria-sort="descending" style="width:15%;">Date</th>
+									<th style="width:15%;">Name</th>
+									<th style="display:none;">Id</th>
+									<th style="width:15%;">Type</th>
+									<th style="width:15%;">Duration</th>
+									<th style="width:10%;">Exercises</th>
+									<th style="width:12.5%;">Volume</th>
+									<th style="width:12.5%;">Calories</th>
+									<th>Actions</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% if workouts %}
+									{% for workout in workouts %}
 									<tr>
-										<th class="sorting_desc" aria-sort="descending">Date</th>
-										<th style="display:none;">Id</th>
-										<th>Workout</th>
-										<th>Duration</th>
-										<th>Exercises</th>
-										<th>Volume</th>
-										<th>Calories</th>
-										<th>Actions</th>
+										<td class="d-none d-xl-table-cell">{{ workout.log_date }}</td>
+										<td style="display:none;" id="{{workout.id}}">{{ workout.id }}</td>
+										<td class="d-none d-xl-table-cell">{{ workout.name }}</td>
+										<td class="d-none d-xl-table-cell">{{ workout.saved_workout }}</td>
+										<td class="d-none d-xl-table-cell">{{ workout.duration }} min</td>
+										<td class="d-none d-md-table-cell">{{ workout.exercises }} exercises</td>
+										<td class="d-none d-md-table-cell volume">{{ workout.volume }}</td>
+										<td class="d-none d-md-table-cell">{{ workout.calories }} cals</td>
+										<td class="table-action">
+											<a onclick="editWorkout({{workout.id}}); return false" id="edit-workout">
+												<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit-2 align-middle">
+													<path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
+											</a>
+											<a id="delWorkout" value="{{workout.id}}" onclick="deleteWorkout({{workout.id}}); return false" data-bs-toggle="modal" data-bs-target="#centeredModalDanger" >
+												<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash align-middle"><polyline points="3 6 5 6 21 6"></polyline>
+													<path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+											</a>
+										</td>
 									</tr>
-								</thead>
-								<tbody>
-									{% if workouts %}
-										{% for workout in workouts %}
-										<tr>
-											<td class="d-none d-xl-table-cell">{{ workout.log_date }}</td>
-											<td style="display:none;" id="{{workout.id}}">{{ workout.id }}
-											<td class="d-none d-xl-table-cell">{{ workout.saved_workout }}</td>
-											<td class="d-none d-xl-table-cell">{{ workout.duration }} min</td>
-											<td class="d-none d-md-table-cell">{{ workout.exercises }} exercises</td>
-											<td class="d-none d-md-table-cell volume">{{ workout.volume }}</td>
-											<td class="d-none d-md-table-cell">{{ workout.calories }} cals</td>
-											<td class="table-action">
-												<button class="btn btn-success" target="_blank" onclick="editWorkout({{workout.id}}); return false" id="edit-workout">
-													<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit-2 align-middle">
-														<path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
-												</button>
-												<button class="btn btn-danger" target="_blank" id="delWorkout" value="{{workout.id}}" onclick="deleteWorkout({{workout.id}}); return false" data-bs-toggle="modal" data-bs-target="#centeredModalDanger" >
-													<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash align-middle"><polyline points="3 6 5 6 21 6"></polyline>
-														<path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-												</button>
-												
-											</td>
-										</tr>
-										
-										{% endfor %}
-									{% else %}
-										{% for workout in workouts %}
-										<tr>
-											<td></td>
-											<td class="d-none d-xl-table-cell"></td>
-											<td class="d-none d-xl-table-cell"></td>
-											<td class="d-none d-md-table-cell"></td>
-											<td class="d-none d-md-table-cell"></td>
-											<td class="d-none d-md-table-cell"></td>
-											<td class="d-none d-md-table-cell"></td>
-										</tr>
-										{% endfor %}
-									{% endif %}
-								</tbody>
-							</table>
-						</div>
+									
+									{% endfor %}
+								{% else %}
+									{% for workout in workouts %}
+									<tr>
+										<td></td>
+										<td class="d-none d-xl-table-cell"></td>
+										<td class="d-none d-xl-table-cell"></td>
+										<td class="d-none d-xl-table-cell"></td>
+										<td class="d-none d-md-table-cell"></td>
+										<td class="d-none d-md-table-cell"></td>
+										<td class="d-none d-md-table-cell"></td>
+										<td class="d-none d-md-table-cell"></td>
+									</tr>
+									{% endfor %}
+								{% endif %}
+							</tbody>
+						</table>
+					
 					</div>
 				</div>
 				<!--Workouts chart-->
 				<div class="col-12 col-xl-3">
 					<div class="card flex-fill w-100">
 						<div class="card-header">
-							<h5 class="card-title mb-0">Average Volume by Workout</h5>
+							<h5 class="card-title mb-0">Average Calories Burned per Minute by Workout</h5>
 						</div>
 						<div class="card-body d-flex">
 							<div class="align-self-center w-100">
@@ -252,14 +314,14 @@
 									<thead>
 										<tr>
 											<th>Workout</th>
-											<th class="text-end">Volume</th>
+											<th class="text-end">Calories/Min</th>
 										</tr>
 									</thead>
 									<tbody>
 										{% for sum in sums %}
 										<tr>
 											<td>{{ sum.saved_workout }}</td>
-											<td class="text-end">{{ sum.average_volume }}</td>
+											<td class="text-end">{{ sum.average_calories }}</td>
 										</tr>
 										{% endfor %}
 									</tbody>
@@ -294,55 +356,6 @@
 	</main>
 {% endblock %}
 {% block js %}
-	<script>
-		//Bar and pie charts for dashboard
-		document.addEventListener("DOMContentLoaded", function() {
-			// Bar chart
-			new Chart(document.getElementById("chartjs-dashboard-bar"), {
-				type: "bar",
-				data: {
-					labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-					datasets: [{
-						label: "Last year",
-						backgroundColor: window.theme.primary,
-						borderColor: window.theme.primary,
-						hoverBackgroundColor: window.theme.primary,
-						hoverBorderColor: window.theme.primary,
-						data: [168, 168, 170, 152, 145, 165, 143, 155, 165, 164, 170, 168],
-						barPercentage: .325,
-						categoryPercentage: .5
-					}]
-				},
-				options: {
-					maintainAspectRatio: false,
-					cornerRadius: 15,
-					legend: {
-						display: false
-					},
-					scales: {
-						yAxes: [{
-							gridLines: {
-								display: false
-							},
-							stacked: false,
-							ticks: {
-								stepSize: 20
-							},
-							stacked: true,
-						}],
-						xAxes: [{
-							stacked: false,
-							gridLines: {
-								color: "transparent"
-							},
-							stacked: true,
-						}]
-					}
-				}
-			});
-		});
-	</script>
-
 	<script type="text/javascript">
 		$(document).ready(function() {
 			
@@ -357,19 +370,21 @@
 			};
 
 			// Overall progress
-			var progressO = ({{ goals.calories }} - {{ macros.calories }}) / {{ goals.calories }};
-			var cals = macros.carbs
-			progressO = Math.round(progressO * 100);
-			if (progressO < 0) {
-				progressO = 100;
+			if ({{ macros.calories }} > {{ goals.calories }}) {
+				var progressO = 100;
+			} else {
+				var progressO = {{ macros.calories }} / {{ goals.calories }};
+				progressO = Math.round(progressO * 100);
 			}
+			
 			$('.progO').attr('style', 'width: ' + progressO + '%');
 			$('.progO').attr('aria-valuenow', progressO);
-			$('.remainingO').text({{ goals.carbs }} - {{ macros.carbs }});
+			$('.remainingO').text({{ goals.calories }} - {{ macros.calories }});
 			var x = progress(progressO);
 			$('.progO').addClass(x);
 
-			var progressC = ({{ goals.carbs }} - {{ macros.carbs}}) / {{ goals.carbs }};
+
+			var progressC = {{ macros.carbs}} / {{ goals.carbs }};
 			progressC = Math.round(progressC * 100);
 			if (progressC < 0) {
 				progressC = 100;
@@ -380,7 +395,8 @@
 			var x = progress(progressC);
 			$('.progC').addClass(x);
 
-			var progressP = ({{ goals.protein }} - {{ macros.protein}}) / {{ goals.protein }};
+
+			var progressP = {{ macros.protein}} / {{ goals.protein }};
 			progressP = Math.round(progressP * 100);
 			if (progressP < 0) {
 				progressP = 100;
@@ -391,10 +407,12 @@
 			var y = progress(progressP);
 			$('.progP').addClass(y);
 
-			var progressF = ({{ goals.fats }} - {{ macros.fats}}) / {{ goals.fats }};
-			progressF = Math.round(progressF * 100);
-			if (progressF < 0) {
-				progressF = 100;
+
+			if ({{ macros.fats }} > {{ goals.fats }}) {
+				var progressF = 100;
+			} else {
+				var progressF = {{ macros.fats}} / {{ goals.fats }};
+				progressF = Math.round(progressF * 100);
 			}
 			$('.progF').attr('style', 'width: ' + progressF + '%');
 			$('.progF').attr('aria-valuenow', progressF);
@@ -492,5 +510,66 @@
 				}
 			});
 		});
+	</script>
+	<script>
+		document.addEventListener("DOMContentLoaded", function() {
+			var labels = [];
+			var data = [];
+			{% for weight in weights %}
+				labels.push({{ weight.log_date }});
+				data.push({{ weight.weight }});
+			{% endfor %}
+
+			new Chart(document.getElementById("chartjs-line"), {
+				type: "line",
+				data: {
+					labels: labels,
+					datasets: [{
+						label: "Weight",
+						fill: true,
+						backgroundColor: "transparent",
+						borderColor: window.theme.primary,
+						data: data
+					}]
+				},
+				options: {
+					maintainAspectRatio: false,
+					legend: {
+						display: false
+					},
+					tooltips: {
+						intersect: false
+					},
+					hover: {
+						intersect: true
+					},
+					plugins: {
+						filler: {
+							propagate: false
+						}
+					},
+					scales: {
+						xAxes: [{
+							reverse: true,
+							gridLines: {
+								color: "rgba(0,0,0,0.05)"
+							}
+						}],
+						yAxes: [{
+							ticks: {
+								stepSize: 500
+							},
+							display: true,
+							borderDash: [5, 5],
+							gridLines: {
+								color: "rgba(0,0,0,0)",
+								fontColor: "#fff"
+							}
+						}]
+					}
+				}
+			});
+		});
+	
 	</script>
 {% endblock %}

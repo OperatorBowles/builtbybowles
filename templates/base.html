@@ -5,65 +5,45 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<meta name="description" content="Responsive Bootstrap 5 Admin &amp; Dashboard Template">
-	<meta name="author" content="Bootlab">
 	<title>{% block title %}{% endblock %}</title>
 	<link rel="canonical" href="/" />
 	<link rel="shortcut icon" href="/static/img/favicon.ico">
 	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
 	<link href="/static/light.css" rel="stylesheet">
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
 </head>
-<body data-theme="colored" data-layout="fluid" data-sidebar-position="left" data-sidebar-behavior="sticky">
+<body data-layout="fluid">
+	
+
+
+
 	<div class="wrapper">
 		<div class="main">
 			<nav class="navbar navbar-expand navbar-light navbar-bg">
 				<a href="/"><span class="align-middle me-3">Built by Bulls</span></a>
-				
-				
 				<ul class="navbar-nav navbar-align">
+					<li class="nav-item dropdown">
+						<a class="nav-icon dropdown-toggle" data-bs-toggle="modal" data-bs-target="#new-workout">
+							<div class="position-relative">
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity align-middle me-2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+							</div>
+						</a>
+						
+					</li>
+					<li class="nav-item dropdown">
+						<a class="nav-icon dropdown-toggle" data-bs-toggle="modal" data-bs-target="#new-weight">
+							<div class="position-relative">
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-heart align-middle me-2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+							</div>
+						</a>
+						
+					</li>
 					<li class="nav-item dropdown">
 						<a class="nav-icon dropdown-toggle" data-bs-toggle="modal" data-bs-target="#centeredModalSuccess">
 							<div class="position-relative">
 								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-target align-middle me-2"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
 							</div>
 						</a>
-						<div class="modal fade" id="centeredModalSuccess" tabindex="-1" style="display: none;" aria-hidden="true">
-							<div class="modal-dialog modal-dialog-centered" role="document">
-								<div class="modal-content">
-									<div class="modal-header">
-										<h5 class="modal-title">Nutrient Goals</h5>
-										<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-									</div>
-									<div class="modal-body m-1">
-										<form action="/tracking" method="POST">
-											<div class="form-floating mb-3">
-												<input type="number" pattern="[0-9]*" name="calories" class="form-control" placeholder="Calories" id="floatingInput0">
-												<label for="floatingInput0">Calories</label>
-											</div>
-											
-											<div class="form-floating mb-3">
-												<input type="number" pattern="[0-9]*" name="carbs" class="form-control" placeholder="Carbs" id="floatingInput1">
-												<label for="floatingInput1">Carbs</label>
-											</div>
-											<div class="form-floating mb-3">
-												<input type="number" pattern="[0-9]*" name="protein" class="form-control" placeholder="Protein" id="floatingInput2">
-												<label for="floatingInput2">Protein</label>
-											</div>
-											<div class="form-floating mb-3">
-												<input type="number" pattern="[0-9]*" name="fats" class="form-control" placeholder="Fats" id="floatingInput3">
-												<label for="floatingInput3">Fats</label>
-											</div>
-											<div class="modal-footer">
-												<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-												<button type="submit" class="btn btn-success" name="goal" id="goal">Save changes</button>
-											</div>
-										</form>
-									</div>
-
-								</div>
-							</div>
-						</div>
+						
 					</li>
 					
 					<li class="nav-item dropdown">
@@ -117,17 +97,96 @@
 			});
 		});
 	</script>
-
 	<script>
-		document.getElementById("goal").addEventListener('click', function() {
-	
+		document.addEventListener("DOMContentLoaded", function() {
+			{% if goals %}
+				var gCalories = Number({{ goals.calories }});
+				document.getElementById("calories").value=gCalories;
+
+				var gCarbs = Math.round(((Number({{ goals.carbs}}) * 4) / gCalories) * 100);
+				document.getElementById("carbPerc").textContent=gCarbs;
+				document.getElementById("carbGrams").textContent=Number({{ goals.carbs }});
+				document.getElementById("rngCarb").value=gCarbs;
+
+				var gProtein = Math.round(((Number({{ goals.protein}}) * 4) / gCalories) * 100);
+				document.getElementById("proteinPerc").textContent=gProtein;
+				document.getElementById("proteinGrams").textContent=Number({{ goals.protein }});
+				document.getElementById("rngProtein").value=gProtein;
+
+				var gFats = Math.round(((Number({{ goals.fats}}) * 8) / gCalories) * 100);
+				document.getElementById("fatPerc").textContent=gFats;
+				document.getElementById("fatGrams").textContent=Number({{ goals.fats }});
+				document.getElementById("rngFat").value=gFats;
+
+			{% else %}
+			{% endif %}
+		});
+
+		{% if goals %}
+			var carbGoal = Number({{ goals.calories }}/4);
+			var proteinGoal = Number({{ goals.calories }}/4);
+			var fatGoal = Number({{ goals.calories }}/8);
+
+			var curCarbVal = Number(document.getElementById("carbPerc").textContent/100);
+			var curProteinVal = Number(document.getElementById("proteinPerc").textContent/100);
+			var curFatVal = Number(document.getElementById("fatPerc").textContent/100);
+		{% else %}
+			var curCarbVal = .5;
+			var curProteinVal = .5;
+			var curFatVal = .5;
+		{% endif %}
+
+		const calories = document.getElementById("calories");
+		calories.addEventListener('change', updateValue);
+		var calGoal = 0;
+
+		function updateValue(e) {
+			calGoal = e.target.value;
+			carbGoal = Math.ceil(calGoal/4);
+			proteinGoal = Math.ceil(calGoal/4);
+			fatGoal = Math.ceil(calGoal/8);	
+
+			document.getElementById("carbGrams").textContent=Math.ceil(carbGoal*curCarbVal);
+			document.getElementById("proteinGrams").textContent=Math.ceil(proteinGoal*curProteinVal);
+			document.getElementById("fatGrams").textContent=Math.ceil(fatGoal*curFatVal);
+		};
+
+		function updateCarbInput(val) {
+			document.getElementById("carbPerc").textContent=val;
+			document.getElementById("carbGrams").textContent=Math.ceil(carbGoal*(val/100));
+			validateEntries();
+		};
+		function updateProteinInput(val) {
+			document.getElementById("proteinPerc").textContent=val;
+			document.getElementById("proteinGrams").textContent=Math.ceil(proteinGoal*(val/100));
+			validateEntries();
+		};
+		function updateFatInput(val) {
+			document.getElementById("fatPerc").textContent=val;
+			document.getElementById("fatGrams").textContent=Math.ceil(fatGoal*(val/100));
+			validateEntries();
+		};
+
+		function validateEntries() {
+			var totalPer = (Number(document.getElementById("carbPerc").textContent) + Number(document.getElementById("proteinPerc").textContent) + Number(document.getElementById("fatPerc").textContent));
+			if (totalPer == 100) {
+				document.getElementById("submitGoal").disabled = false;
+			} else {
+				document.getElementById("submitGoal").disabled = true;
+			};
+		};
+		
+	</script>
+	<script>
+		document.getElementById("submitGoal").addEventListener('click', function() {
+
 			$.ajax({
 				url: "/tracking",
 				type: "POST",
 				data:{id: id},
 				success: function(data) {
 					if (data.Success){
-						$(obj).closest("tr").remove();
+						console.log("Succesfully logged goals");
 					};
 				}
 			})

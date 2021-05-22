@@ -47,7 +47,7 @@
 				</div>
 			</div>
 
-			<div class="col-md-9 col-xl-10">
+			<div class="col-md-9 col-xl-3">
 				<div class="tab-content">
 					<!--Personal card-->
 					<div class="tab-pane fade show active" id="personal" role="tabpanel">
@@ -174,21 +174,48 @@
 						<div class="card">
 							<div class="card-header">
 								<div class="card-actions float-end">
+									{% if mfp %}
 									<div class="dropdown show">
 										<a href="#" data-bs-toggle="dropdown" data-bs-display="static">
 											<i class="align-middle" data-feather="more-horizontal"></i>
 										</a>
 
 										<div class="dropdown-menu dropdown-menu-end">
-											<a class="dropdown-item" href="#">Edit details</a>
+											<a class="dropdown-item" id="edit_mfp">Edit details</a>
 											<a class="dropdown-item" style="color:red;" href="#">Delete account</a>
 										</div>
 									</div>
+									{% else %}
+									{% endif %}
 								</div>
 								<h5 class="card-title mb-0">MyFitnessPal</h5>
 							</div>
 							<div class="card-body">
-								<form action="/settings" method="POST" autocomplete="off">
+								{% if mfp %}
+								<span id="linked_mfp" class="badge rounded-pill bg-success">Account linked</span>
+								<form action="/settings" method="POST" style="display:none;" id="form_mfp">
+									<div class="row">
+										<div class="col-md-8">
+											<div class="mb-3">
+												<label for="inputEmailPal" class="form-label">Username</label>
+												<input type="text" class="form-control" name="inputEmailPal" id="inputEmailPal" placeholder="Username" autocomplete="off">
+											</div>
+											<div class="mb-3">
+												<label for="inputPasswordPal" class="form-label">Password</label>
+												<input type="password" class="form-control" name="inputPasswordPal" id="inputPasswordPal" placeholder="Password" autocomplete="new-password">
+											</div>
+											
+										</div>
+									</div>
+
+									<button name="submit_button" id="submit_button" value="mfp" class="btn btn-primary">Link Account</button>
+									<div class="spinner-border spinner-border-sm text-dark me-2" id="mfp_loading" role="status" style="display:none;">
+										<span class="sr-only">Loading...</span>
+									</div>
+								</form>
+								
+								{% else %}
+								<form action="/settings" method="POST">
 									<div class="row">
 										<div class="col-md-8">
 											<div class="mb-3">
@@ -199,11 +226,16 @@
 												<label for="inputPasswordPal" class="form-label">Password</label>
 												<input type="password" class="form-control" name="inputPasswordPal" id="inputPasswordPal" placeholder="Password" autocomplete="new-password">
 											</div>
+											
 										</div>
 									</div>
 
-									<button type="submit" name="submit_button" id="submit_button" value="mfp" class="btn btn-primary">Save changes</button>
+									<button name="submit_button" id="submit_button" value="mfp" class="btn btn-primary">Link Account</button>
+									<div class="spinner-border spinner-border-sm text-dark me-2" id="mfp_loading" role="status" style="display:none;">
+										<span class="sr-only">Loading...</span>
+									</div>
 								</form>
+								{% endif %}
 
 							</div>
 						</div>
@@ -217,7 +249,7 @@
 
 										<div class="dropdown-menu dropdown-menu-end">
 											<a class="dropdown-item" href="#">Edit details</a>
-											<a class="dropdown-item" style="color:red;" href="#">Relete account</a>
+											<a class="dropdown-item" style="color:red;" href="#">Delete account</a>
 										</div>
 									</div>
 								</div>
@@ -292,25 +324,34 @@
 			});
 		});
 </script>
-{% endblock %}
+<script>
+	document.getElementById("submit_button").addEventListener('click', function() {
 
-<!--
-var message = "Successfully linked account!";
-var type = success;
-var duration = 3000;
-var ripple = False;
-var dismissible = True;
-var positionX =  right;
-var positionY = top;
-window.notyf.open({
-	type,
-	message,
-	duration,
-	ripple,
-	dismissible,
-	position: {
-		x: positionX,
-		y: positionY
-	}
-});
--->
+		document.getElementById("submit_button").textContent="Working";
+		document.getElementById("mfp_loading").style.display="block";
+
+		$.ajax({
+			url: "/settings",
+			type: "POST",
+			data:{id: id},
+			success: function(data) {
+				if (data.Success){
+					console.log("Succesfully logged goals");
+					document.getElementById("mfp_loading").style.display="none";
+				};
+			}
+		})
+	});
+
+
+	document.getElementById("edit_mfp").addEventListener('click', function() {
+		
+
+		document.getElementById("linked_mfp").style.display = "none";
+		document.getElementById("form_mfp").style.display="block";
+		document.getElementById("inputEmailPal").value="{{mfp.username}}";
+		document.getElementById("submit_button").textContent="Update Account";
+		
+	});	
+</script>
+{% endblock %}
