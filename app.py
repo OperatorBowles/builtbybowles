@@ -347,11 +347,12 @@ def signout():
     session["email"] = None
     return render_template("index.html")
 
+
 @app.route('/login', methods=["GET", "POST"])
 def login():
     if request.method == "POST":
 
-        con = sqlite3.connect("health.db")
+        con = sqlite3.connect('health.db')
         con.row_factory = sqlite3.Row
         get_pass = con.cursor()
         password = get_pass.execute("SELECT password FROM users WHERE email = ?;", (request.form.get('email'),)).fetchone()
@@ -367,7 +368,7 @@ def login():
         else:
             print('Passwords are not the same')
             return render_template("pages-sign-in.html")
-        
+
     return render_template("pages-sign-in.html") # If error send back to the Login page
 
 @app.route('/tracking', methods=["POST", "GET"])
