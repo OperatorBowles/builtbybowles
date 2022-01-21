@@ -2,6 +2,8 @@ import csv, sqlite3
 import myfitnesspal
 import locale
 import time
+import hashlib
+import os
 from django.shortcuts import render
 from datetime import datetime, timedelta
 from sqlite3 import Error
@@ -298,7 +300,7 @@ def index():
             l_workouts = list_workouts()
             activities = list_activities()
 
-            return render_template("dashboard-default.html", workouts=workouts, sums=sums, weights=weights, macros=macros, goals=goals, lastRefresh=lastRefresh, l_workouts=l_workouts, activities=activities)
+            return render_template("dashboard-default.html", workouts=workouts, sums=sums, weights=weights, macros=macros, goals=goals, l_workouts=l_workouts, activities=activities)
         else:
             return render_template("index.html")
     else:
