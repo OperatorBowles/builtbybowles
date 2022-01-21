@@ -350,9 +350,25 @@ def signout():
 @app.route('/login', methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        session["email"] = request.form.get("email")
-        return redirect("/")
-    return render_template("pages-sign-in.html")
+
+        con = sqlite3.connect("health.db")
+        con.row_factory = sqlite3.Row
+        get_pass = con.cursor()
+        password = get_pass.execute("SELECT password FROM users WHERE email = ?;", (request.form.get('email'),)).fetchone()
+        password = password[0]
+
+        salt = password[:32] # Get the salt
+        key = password[32:] # Get the key
+        new_key = hashlib.pbkdf2_hmac('sha256', request.form.get('password').encode('utf-8'), salt, 100000)
+
+        if key == new_key:
+            print('Login successful')
+            return redirect("/")
+        else:
+            print('Passwords are not the same')
+            return render_template("pages-sign-in.html")
+        
+    return render_template("pages-sign-in.html") # If error send back to the Login page
 
 @app.route('/tracking', methods=["POST", "GET"])
 def tracking():
@@ -457,17 +473,18 @@ def register():
         session["name"] = request.form.get("name")
         session["email"] = request.form.get("email")
         
-        # Get variables from the form
+        # Get email, name, and password from the form
         email = request.form.get("email")
         name = request.form.get("name")
-        password = request.form.get("password")
+
+        salt = os.urandom(32)
+        key = hashlib.pbkdf2_hmac('sha256', request.form.get("password").encode('utf-8'), salt, 100000)
+        password = salt + key
 
         # Register the new user
         user = (email, name, password)
         conn = create_connection(DATABASE)
         register_user(conn, user)
-
-        print('I updated the login branch')
 
         return redirect("/")
     else:
