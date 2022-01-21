@@ -467,7 +467,7 @@ def register():
         conn = create_connection(DATABASE)
         register_user(conn, user)
 
-        
+        print('I updated the login branch')
 
         return redirect("/")
     else:
