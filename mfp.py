@@ -2,10 +2,7 @@ import myfitnesspal
 import stdiomask
 
 def signin():
-    #conn = create_connection(DATABASE)
-    #cur = conn.cursor()
-    #r = cur.execute("SELECT acct_email, acct_password FROM accounts").fetchone()
-    #print(r[0], r[1])
+    # Attempt to login with user password
     try:
         client = myfitnesspal.Client('geoffreybowles3', password=stdiomask.getpass())
         return client
